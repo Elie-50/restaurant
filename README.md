@@ -61,7 +61,7 @@ This stack was carefully chosen to provide scalability, performance, and a smoot
 1. Clone repo
    ```bash
    git clone https://github.com/elie-50/restaurant.git
-   cd restaurant-app
+   cd restaurant
    ```
 
 2. Install dependencies
