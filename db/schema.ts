@@ -1,4 +1,4 @@
-import { mysqlTable, int,  varchar, timestamp, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, timestamp, mysqlEnum, boolean } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 export const users = mysqlTable("users", {
@@ -24,4 +24,9 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("created_at", { mode: "date" })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
+
+  role: mysqlEnum("role", ["admin", "staff", "customer"])
+    .notNull()
+    .default("customer"),
+    
 });

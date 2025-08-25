@@ -6,7 +6,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       {/* Left side: form */}
       <div className="flex flex-col items-center justify-center p-6 bg-transparent">
-        <h1 className="text-3xl font-bold mb-2">Restaurant&apos;s name</h1>
+        <h1 className="text-3xl font-bold mb-2 hidden lg:block">DSS</h1>
         <div className="w-full max-w-md">{children}</div>
       </div>
 
