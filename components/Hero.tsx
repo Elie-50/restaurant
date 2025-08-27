@@ -16,22 +16,18 @@ function Hero() {
             Discover our delicious meals made with fresh ingredients, served hot
             and fast. Your taste buds will thank you!
           </p>
-          <Link
-            href="/menu"
-          >
+          <Link href="/menu" >
             <div className="flex flex-row order-now items-center justify-center w-full lg:w-fit">
                 <span>Order Now</span>
                 <ArrowRightCircleIcon className="w-7 h-7 mx-2" />
             </div>
-            
-            
           </Link>
         </div>
 
         {/* Right Side: Burger Image (hidden on small devices) */}
         <div className="hero-image">
           <Image
-            src="/pizza.png"
+            src="/burger.png"
             alt="Burger"
             fill
             className="object-contain"

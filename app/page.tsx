@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-import Image from "next/image";
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import HeroGSAP from "@/components/HeroGSAP";
@@ -23,9 +22,13 @@ export default async function Home() {
 
   return (
     <>
-      <Navbar isAuthenticated={isAuthenticated} />
-      <HeroGSAP />
-      <Hero />
+      <main className="planks">
+        <div className="lg:max-w-7xl lg:mx-auto lg:p-4">
+        <Navbar isAuthenticated={isAuthenticated} />
+        <HeroGSAP />
+        <Hero />
+        </div>
+      </main>
     </>
   );
 }
