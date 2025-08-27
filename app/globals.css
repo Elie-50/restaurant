@@ -58,7 +58,7 @@
   --card-foreground: oklch(57.316% 0.23521 29.223);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(92.829% 0.01268 271.286);
+  --primary: oklch(92.494% 0.00011 271.152);
   --primary-foreground: oklch(0.984 0.003 247.858);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
@@ -128,10 +128,26 @@
   }
 
   .title {
-    @apply text-6xl text-center font-bold text-primary;
+    @apply text-primary lg:text-5xl text-3xl text-center lg:text-left font-bold mb-4;
+  }
+
+  .subtitle {
+    @apply text-lg lg:text-2xl text-gray-800 font-bold mb-6 lg:w-md;
   }
 
   .auth-link {
     @apply hover:underline text-red-600;
+  }
+
+  .hero-image {
+    @apply hidden md:block relative w-full h-80;
+  }
+
+  .planks {
+    @apply py-16 bg-[url('/vintage-planks.jpg')] bg-no-repeat bg-cover bg-blend-multiply;
+  }
+
+  .order-now {
+    @apply bg-red-600 text-white text-sm lg:text-lg px-6 py-3 rounded-full shadow-md hover:bg-red-700 transition;
   }
 }

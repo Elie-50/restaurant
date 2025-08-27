@@ -34,8 +34,10 @@ export default function RootLayout({
       <body
         className={`${modern_antique.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main className="max-w-7xl mx-auto p-4">
-          {children}
+        <main className="planks">
+          <div className="lg:max-w-7xl lg:mx-auto lg:p-4">
+            {children}
+          </div>
         </main>
       </body>
     </html>
