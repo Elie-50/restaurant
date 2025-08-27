@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ErrorLine from "@/components/ErrorLine";
+import Link from "next/link";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -106,12 +107,9 @@ export default function SignupPage() {
       </Button>
 
       <p>Already have an account? {" "}
-        <span
-            className="hover:underline text-blue-500 hover:cursor-pointer"
-            onClick={() => router.push('/login')}
-        >
-            Log in
-        </span>
+        <Link className="auth-link" href={'/login'}>
+          Log in
+        </Link>
       </p>
     </form>
   );

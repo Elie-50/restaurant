@@ -1,6 +1,6 @@
 # 🍽️ Restaurant App
 
-A modern restaurant management web application built with **Next.js 15+, TypeScript, MySQL, Drizzle ORM, and Zustand**.  
+A modern restaurant management web application built with **Next.js 15+, TypeScript, PostgreSQL, Drizzle ORM, and Zustand**.  
 This stack was carefully chosen to provide scalability, performance, and a smooth developer experience.
 
 ---
@@ -20,11 +20,16 @@ This stack was carefully chosen to provide scalability, performance, and a smoot
   - Great developer tooling (autocompletion, refactoring).
   - Makes team collaboration safer and faster.
 
-### **Database: MySQL**
-- **Why MySQL?**
-  - Relational database with strong consistency → reliable for orders, reservations, and user accounts.
-  - Well-known, stable, and widely supported.
-  - Easy integration with Drizzle ORM and scalable for future growth.
+### **Database: PostgreSQL**
+- **Why PostgreSQL?**
+
+  - Advanced features like native UUIDs, JSON support, and rich indexing for complex queries.
+
+  - Strong type system and reliability → safer for user accounts, orders, and reservations.
+
+  - Easier integration with Drizzle ORM’s PostgreSQL driver, including .returning() support for inserts and updates.
+
+  - Full support for enums, constraints, and migrations → makes schema evolution safer and simpler.
 
 ### **ORM: Drizzle ORM**
 - **Why Drizzle?**
@@ -43,7 +48,7 @@ This stack was carefully chosen to provide scalability, performance, and a smoot
 ---
 
 ## ✨ Benefits of this Stack
-- **Performance-first:** Next.js + MySQL ensures both frontend and backend scale well under traffic.
+- **Performance-first:** Next.js + PostgreSQL ensures both frontend and backend scale well under traffic.
 - **Developer-friendly:** TypeScript + Drizzle ORM provide end-to-end type safety.
 - **Maintainable:** Clear separation of concerns (UI, state, data).
 - **Scalable:** Easy to extend with features like loyalty programs, online ordering, or admin dashboards.
@@ -59,27 +64,29 @@ This stack was carefully chosen to provide scalability, performance, and a smoot
 ## 🛠️ Getting Started
 
 1. Clone repo
-   ```bash
-   git clone https://github.com/elie-50/restaurant.git
-   cd restaurant
-   ```
+  ```bash
+  git clone https://github.com/elie-50/restaurant.git
+  cd restaurant
+  ```
 
 2. Install dependencies
-    ```bash
-    npm install
-    ```
+  ```bash
+  npm install
+  ```
 3. Setup .env
-    ```bash
-    DATABASE_URL="mysql://username:password@localhost:3306/restaurant"
-    JWT_SECRET="supersecretkey"
-    ```
+  ```bash
+  DATABASE_URL="mysql://username:password@localhost:3306/restaurant"
+  JWT_SECRET="supersecretkey"
+  ```
 4. Run migrations
-    ```bash
-    npx drizzle-kit push
-    ```
+  ```bash
+  npx drizzle-kit generate
+  npx drizzle-kit migrate
+  npx drizzle-kit push
+  ```
 
 5. Start dev server
-    ```bash
-    npm run dev
-    ```
+  ```bash
+  npm run dev
+  ```
 

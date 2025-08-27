@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ErrorLine from "@/components/ErrorLine";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function LoginPage() {
 
     try {
       const res = await axios.post("/api/auth/login", form, {
-        withCredentials: true, // needed for cookies
+        withCredentials: true,
       });
 
       if (res.status === 200) {
@@ -90,12 +91,9 @@ export default function LoginPage() {
       </Button>
 
       <p>Don&apos;t have an account yet? {" "}
-        <span
-            className="hover:underline text-blue-500 hover:cursor-pointer"
-            onClick={() => router.push('/sign-up')}
-        >
-            Sign Up
-        </span>
+        <Link className="auth-link" href={'/sign-up'}>
+          Sign Up
+        </Link>
       </p>
     </form>
   );

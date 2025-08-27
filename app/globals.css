@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.text-gradient {
+  background: linear-gradient(to bottom, #ffffff, #747474);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -48,10 +55,10 @@
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(57.316% 0.23521 29.223);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
+  --primary: oklch(92.829% 0.01268 271.286);
   --primary-foreground: oklch(0.984 0.003 247.858);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
@@ -118,5 +125,13 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .title {
+    @apply text-6xl text-center font-bold text-primary;
+  }
+
+  .auth-link {
+    @apply hover:underline text-red-600;
   }
 }
