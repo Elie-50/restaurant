@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -26,9 +26,9 @@ function LogoutButton() {
       variant="outline"
       onClick={handleLogout}
       disabled={loading}
-      className="flex items-center space-x-2 my-2 border-red-500 text-red-500 hover:text-red-600 hover:border-red-600"
+      className="flex hover:bg-red-200 items-center space-x-2 my-2 border-red-500 text-red-500 hover:text-red-600 hover:border-red-600"
     >
-      <ArrowRightOnRectangleIcon className="h-7 w-7" />
+      <LogOut className="h-7 w-7" />
       <span>{loading ? "Logging out..." : "Logout"}</span>
     </Button>
   );

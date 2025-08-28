@@ -38,6 +38,7 @@ export async function POST(req: Request) {
         username: users.username,
         email: users.email,
         password: users.password,
+        role: users.role
       })
       .from(users)
       .where(eq(users.username, username));
@@ -60,6 +61,7 @@ export async function POST(req: Request) {
         id: user.id,
         email: user.email,
         username: user.username,
+        role: user.role
       },
       JWT_SECRET,
       { expiresIn: '7d' }

@@ -1,33 +1,17 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
-
-function getUserIdFromRequest(req: Request): string | null {
-  const cookie = req.headers.get("cookie");
-  if (!cookie) return null;
-
-  const token = cookie
-    .split("; ")
-    .find((c) => c.startsWith("token="))
-    ?.split("=")[1];
-
-  if (!token) return null;
-
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    return decoded.id;
-  } catch {
-    return null;
-  }
-}
+import { getUserIdFromRequest } from "@/utils/functions";
 
 export async function GET(req: Request) {
-  const userId = getUserIdFromRequest(req);
+  const cookie = getUserIdFromRequest(req);
+
+    if (!cookie) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { userId } = cookie;
   if (!userId) return NextResponse.json({ user: null }, { status: 401 });
 
   const user = await db.select().from(users).where(eq(users.id, userId));
@@ -37,7 +21,13 @@ export async function GET(req: Request) {
 }
 
 export async function PUT(req: Request) {
-  const userId = getUserIdFromRequest(req);
+  const cookie = getUserIdFromRequest(req);
+
+    if (!cookie) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { userId } = cookie;
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
@@ -62,7 +52,13 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const userId = getUserIdFromRequest(req);
+  const cookie = getUserIdFromRequest(req);
+
+    if (!cookie) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { userId } = cookie;
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {

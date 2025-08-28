@@ -44,7 +44,8 @@ export default function ProfilePage() {
 
   if (user)
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow">
+    <div className="mx-auto p-6 bg-white rounded-2xl shadow">
+      <h2 className="page-header">Profile</h2>
       <div className="flex items-center gap-4 mb-6">
         <UserCircle className="h-12 w-12 text-gray-500" />
         <div>

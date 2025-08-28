@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp, pgEnum, boolean, uuid } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, integer, pgEnum, boolean, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const roleEnum = pgEnum("role", ["admin", "cashier", "customer", "delivery"]);
@@ -31,5 +31,6 @@ export const users = pgTable("users", {
     .default(sql`CURRENT_TIMESTAMP`),
 
   role: roleEnum("role").notNull().default("customer"),
+  points: integer("points").default(0).notNull(),
   isActive: boolean("is_active").default(true).notNull()
 });
