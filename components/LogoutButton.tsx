@@ -23,12 +23,12 @@ function LogoutButton() {
 
   return (
     <Button
-      variant="destructive"
+      variant="outline"
       onClick={handleLogout}
       disabled={loading}
-      className="flex items-center space-x-2 my-2"
+      className="flex items-center space-x-2 my-2 border-red-500 text-red-500 hover:text-red-600 hover:border-red-600"
     >
-      <ArrowRightOnRectangleIcon className="h-5 w-5" />
+      <ArrowRightOnRectangleIcon className="h-7 w-7" />
       <span>{loading ? "Logging out..." : "Logout"}</span>
     </Button>
   );

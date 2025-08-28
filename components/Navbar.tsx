@@ -7,7 +7,7 @@ function Navbar({ isAuthenticated }: { isAuthenticated: boolean}) {
             DSS
         </Link>
         <nav className="flex lg:items-center gap-8 text-gray-500 font-semibold">
-            <Link className="hover:underline text-primary" href={'/profile'}>Profile</Link>
+            <Link className="hover:underline text-primary" href={'/account/profile'}>Profile</Link>
             <Link className="hover:underline text-primary" href={'/menu'}>Menu</Link>
             <Link className="hover:underline text-primary" href={'/about'}>About</Link>
             <Link className="hover:underline text-primary" href={'/contact-us'}>Contact</Link>

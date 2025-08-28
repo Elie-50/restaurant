@@ -1,7 +1,7 @@
 import { pgTable, varchar, timestamp, pgEnum, boolean, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const roleEnum = pgEnum("role", ["admin", "staff", "customer"]);
+export const roleEnum = pgEnum("role", ["admin", "cashier", "customer", "delivery"]);
 
 export const users = pgTable("users", {
   id: uuid()
@@ -13,6 +13,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   username: varchar("username", { length: 50 }).notNull().unique(),
+  phoneNumber: varchar("phone_number", { length: 20}).unique(),
 
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
@@ -30,4 +31,5 @@ export const users = pgTable("users", {
     .default(sql`CURRENT_TIMESTAMP`),
 
   role: roleEnum("role").notNull().default("customer"),
+  isActive: boolean("is_active").default(true).notNull()
 });

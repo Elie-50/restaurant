@@ -33,7 +33,7 @@ export async function GET(req: Request) {
   const user = await db.select().from(users).where(eq(users.id, userId));
   if (!user[0]) return NextResponse.json({ user: null }, { status: 404 });
 
-  return NextResponse.json({ user: user[0] }, { status: 200 });
+  return NextResponse.json(user[0] , { status: 200 });
 }
 
 export async function PUT(req: Request) {
@@ -41,7 +41,7 @@ export async function PUT(req: Request) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { username, email, firstName, lastName } = body;
+  const { username, email, firstName, lastName, phoneNumber } = body;
 
   try {
     await db
@@ -51,12 +51,11 @@ export async function PUT(req: Request) {
         ...(email && { email }),
         ...(firstName && { firstName }),
         ...(lastName && { lastName }),
+        ...(phoneNumber && { phoneNumber })
       })
       .where(eq(users.id, userId));
 
-    const updated = await db.select().from(users).where(eq(users.id, userId));
-
-    return NextResponse.json({ user: updated[0] }, { status: 200 });
+    return NextResponse.json({ message: "Update Successful" }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
   }
@@ -67,7 +66,7 @@ export async function DELETE(req: Request) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    await db.delete(users).where(eq(users.id, userId));
+    await db.update(users).set({ isActive: false }).where(eq(users.id, userId));
     // Clear cookie
     const res = NextResponse.json({ message: "User deleted successfully" }, { status: 200 });
     res.cookies.set("token", "", { expires: new Date(0) });
