@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -33,11 +34,24 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const res = await axios.post("/api/auth/signup", form);
+      // Post to Django backend signup endpoint
+      const res = await axios.post(
+        "http://localhost:8000/api/auth/signup/", // replace with your backend URL
+        {
+          username:form.username,
+          email: form.email,
+          password: form.password,
+          first_name: form.firstName,
+          last_name: form.lastName,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
       if (res.status === 201) {
         router.push("/login");
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.error || "Something went wrong");
     } finally {

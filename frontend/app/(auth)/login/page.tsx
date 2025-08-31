@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -16,18 +17,16 @@ export default function LoginPage() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/");
     }
-  }, [isAuthenticated, checkAuth, router]);
+  }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,14 +38,20 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await axios.post("/api/auth/login", form, {
-        withCredentials: true,
-      });
+      const res = await axios.post(
+        "http://localhost:8000/api/auth/login/", // Django backend
+        {
+          username: form.username,
+          password: form.password,
+        },
+        {
+          withCredentials: true, // important: stores session cookie
+        }
+      );
 
       if (res.status === 200) {
         router.push("/");
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.error || "Login failed");
     } finally {
@@ -77,21 +82,15 @@ export default function LoginPage() {
 
       {error && <ErrorLine text={error} />}
 
-      <Button
-        type="submit"
-        disabled={loading}
-      >
+      <Button type="submit" disabled={loading}>
         {loading ? "Logging in..." : "Login"}
       </Button>
 
-      <Button
-        variant="link"
-      >
-        Forgot password?
-      </Button>
+      <Button variant="link">Forgot password?</Button>
 
-      <p>Don&apos;t have an account yet? {" "}
-        <Link className="auth-link" href={'/sign-up'}>
+      <p>
+        Don&apos;t have an account yet?{" "}
+        <Link className="auth-link" href="/sign-up">
           Sign Up
         </Link>
       </p>

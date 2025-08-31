@@ -6,6 +6,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getCSRFToken } from "@/utils/functions";
 
 export default function EditProfilePage() {
   const { user, setUser } = useAuthStore();
@@ -17,10 +18,23 @@ export default function EditProfilePage() {
     phoneNumber: user?.phoneNumber || "",
   });
 
+  const formTransfrom = () => ({
+    first_name: form.firstName,
+    last_name: form.lastName,
+    phone_number: form.phoneNumber
+  })
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const res = await axios.put("/api/auth/me", form, { withCredentials: true });
+      const newForm = formTransfrom();
+      const csrfToken = getCSRFToken();
+      const res = await axios.put("http://localhost:8000/api/users/me/", newForm, { 
+        withCredentials: true,
+        headers: {
+          "X-CSRFToken": csrfToken!,
+        }
+      });
       setUser(res.data.user);
       router.push("/account/profile");
     } catch (err) {
