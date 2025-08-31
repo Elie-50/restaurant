@@ -37,4 +37,4 @@ class PointView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        return Response(request.user.points)
+        return Response({ "points": request.user.points })

@@ -2,13 +2,23 @@ import ErrorLine from "@/components/ErrorLine";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { ArrowRightCircle } from "lucide-react";
-import { getUserPoints } from "@/db/functions/userFunctions";
+import { cookies } from "next/headers";
 
 async function AccountRewards() {
-  let points: number;
+  let points;
 
   try {
-    points = await getUserPoints();
+    const cookieStore = cookies();
+    const sessionCookie = (await cookieStore).get("sessionid")?.value;
+
+    const res = await fetch("http://localhost:8000/api/users/me/points/", {
+      headers: {
+        cookie: `sessionid=${sessionCookie}`,
+      },
+    });
+    
+    const data = await res.json();
+    points = data.points;
   } catch {
     return <ErrorLine text="Failed to fetch points" />;
   }
