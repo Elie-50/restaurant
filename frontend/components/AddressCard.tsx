@@ -26,7 +26,7 @@ function AddressCard({
   handleDelete,
 }: AddressCardProps) {
   return (
-    <Card className="relative flex flex-col md:flex-row overflow-hidden shadow-lg rounded-xl border border-gray-200">
+    <Card data-testid="address-card" className="relative flex flex-col md:flex-row overflow-hidden shadow-lg rounded-xl border border-gray-200">
       {/* Delete Button (Top-Right) */}
       <button
         onClick={() => handleDelete(id)}
