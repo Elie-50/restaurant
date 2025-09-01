@@ -56,3 +56,24 @@ class MeViewTests(BaseAuthAPITestCase):
         response = self.client.put(self.me_url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("email", response.data)
+
+class PointViewTests(BaseAuthAPITestCase):
+    def setUp(self):
+        super().setUp()
+        self.points_url = reverse("points")
+
+        self.existing_user.points = 50
+        self.existing_user.save()
+
+    # -------------------- GET /me/points/ --------------------
+    def test_get_points_unauthenticated(self):
+        response = self.client.get(self.points_url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_points_authenticated(self):
+        self.client.force_login(self.existing_user)
+        response = self.client.get(self.points_url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data
+        self.assertIn("points", data)
+        self.assertEqual(data["points"], self.existing_user.points)
