@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect } from "react";
-
 import { useRouter } from "next/navigation";
 import {
   User,
@@ -71,7 +70,7 @@ export default function ProfilePage() {
   );
 }
 
-function ProfileItem({
+export function ProfileItem({
   icon: Icon,
   label,
   value,
