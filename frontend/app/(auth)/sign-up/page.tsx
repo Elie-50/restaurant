@@ -31,6 +31,11 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.password !== form.confirm) {
+      setError("Passwords don't match");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -64,9 +69,10 @@ export default function SignupPage() {
       onSubmit={handleSubmit}
       className="bg-white p-6 rounded-2xl shadow-md space-y-4"
     >
-      <h1 className="text-2xl font-bold text-center">Sign Up</h1>
+      <h1 data-testid="header" className="text-2xl font-bold text-center">Sign Up</h1>
 
       <Input
+        data-testid="username-input"
         name="username"
         placeholder="Username"
         value={form.username}
@@ -74,12 +80,14 @@ export default function SignupPage() {
         autoComplete="off"
       />
       <Input
+        data-testid="email-input"
         name="email"
         placeholder="Email"
         value={form.email}
         onChange={handleChange}
       />
       <Input
+        data-testid="password-input"
         name="password"
         type="password"
         placeholder="Password"
@@ -87,6 +95,7 @@ export default function SignupPage() {
         onChange={handleChange}
       />
       <Input
+        data-testid="password-confirm"
         name="confirm"
         type="password"
         placeholder="Confirm Password"
@@ -95,6 +104,7 @@ export default function SignupPage() {
       />
       <div className="flex gap-2">
         <Input
+          data-testid="firstname-input"
           className="w-1/2"
           name="firstName"
           placeholder="First Name"
@@ -102,6 +112,7 @@ export default function SignupPage() {
           onChange={handleChange}
         />
         <Input
+          data-testid="lastname-input"
           className="w-1/2"
           name="lastName"
           placeholder="Last Name"
@@ -113,6 +124,7 @@ export default function SignupPage() {
       {error && <ErrorLine text={error} />}
 
       <Button
+        data-testid="submit-button"
         type="submit"
         disabled={loading}
         variant="default"
