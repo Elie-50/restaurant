@@ -5,23 +5,37 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import AddressCard from "@/components/AddressCard";
 import Spinner from "@/components/Spinner";
+import { API_URL } from "@/lib/constants";
 
 type Address = {
   id: string;
   street: string;
   building: string;
   city: string;
-  apartment?: string;
+  floor?: string;
+  createdAt: Date;
   gpsLink?: string;
   imageUrl?: string;
 };
 
+type AddressResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Address[];
+}
+
 export default function AddressesPage() {
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addresses, setAddresses] = useState<AddressResponse>({
+    count: 0,
+    next: null,
+    previous: null,
+    results: []
+  });
   const [loading, setLoading] = useState(true);
 
   async function fetchAddresses() {
-    const res = await fetch("/api/addresses");
+    const res = await fetch(`${API_URL}/addresses/`, { credentials: 'include' });
     const data = await res.json();
     setAddresses(data);
     setLoading(false);
@@ -35,26 +49,26 @@ export default function AddressesPage() {
     if (!confirm("Are you sure you want to delete this address?")) return;
 
     await fetch(`/api/addresses/${id}`, { method: "DELETE" });
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
+    // setAddresses((prev) => prev.results.filter((a) => a.id !== id));
   }
 
 
   return (
     <div className="p-6">
       <h1 className="page-header">My Addresses</h1>
-        { (addresses.length === 0 && !loading) && <p className="text-center mt-10">No addresses added yet</p>}
+        { (addresses.results.length === 0 && !loading) && <p className="text-center mt-10">No addresses added yet</p>}
       <div className="space-y-4">
         {
         loading ?
         <Spinner />
         :
-        addresses.map((address) => (
+        addresses.results.map((address) => (
           <AddressCard 
             key={address.id}
             id={address.id}
             street={address.street}
             city={address.city}
-            apartment={address.apartment}
+            floor={address.floor}
             handleDelete={handleDelete}
             building={address.building}
             imageUrl={address.imageUrl}

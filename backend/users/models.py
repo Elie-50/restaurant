@@ -16,6 +16,8 @@ class Address(BaseModeUUID):
     city = models.CharField(max_length=100)
     building = models.CharField(max_length=100)
     floor = models.CharField(max_length=100)
+    gps_link = models.CharField(max_length=255, null=False, blank=True, default='')
+    image = models.ImageField(upload_to="address_images/", blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

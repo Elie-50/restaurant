@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { API_URL } from "@/lib/constants";
+import { getCSRFToken } from "@/utils/functions";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,7 +14,15 @@ function LogoutButton() {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      const csrfToken = getCSRFToken();
+      await fetch(`${API_URL}/auth/logout/`, { 
+        method: "POST",
+        credentials: 'include',
+        headers: {
+          'X-CSRFToken': csrfToken!
+        },
+      });
+
       router.push("/login");
     } catch (err) {
       console.error("Logout failed", err);

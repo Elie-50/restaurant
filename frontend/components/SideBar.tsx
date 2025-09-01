@@ -15,7 +15,6 @@ import {
   Boxes,
   Users,
   BarChart3,
-  LayoutDashboardIcon,
   LineChart,
   PieChart,
   LockKeyholeIcon,
@@ -88,7 +87,7 @@ export default function Sidebar({ onClick }: { onClick?: () => void }) {
         })}
       </div>
       {
-        user?.role === 'admin' && 
+        user?.role?.toLowerCase() === 'admin' && 
         <>
           <h3 className="px-4 pt-6 pb-2 text-xl font-semibold">Admin</h3>
           <div className="space-y-1 pb-6">

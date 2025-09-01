@@ -8,7 +8,7 @@ type AddressCardProps = {
   id: string;
   street: string;
   building: string;
-  apartment?: string;
+  floor?: string;
   city: string;
   gpsLink?: string;
   imageUrl?: string;
@@ -19,7 +19,7 @@ function AddressCard({
   id,
   street,
   building,
-  apartment,
+  floor,
   city,
   gpsLink,
   imageUrl,
@@ -52,7 +52,7 @@ function AddressCard({
         <CardContent className="p-0 mb-4">
           <p className="text-lg text-gray-700 font-semibold">
             {street}, {building}
-            {apartment ? `, Apt ${apartment}` : ""}
+            {floor ? `, Apt ${floor}` : ""}
           </p>
           <p className="text-gray-600">{city}</p>
           {gpsLink && (

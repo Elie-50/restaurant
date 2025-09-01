@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
 import axios from "axios";
+import { API_URL } from "@/lib/constants";
 
 type User = {
   id: string;
@@ -53,7 +54,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     try {
       await axios.post(
-        "http://localhost:8000/api/auth/logout/",
+        `${API_URL}/auth/logout/`,
         {},
         { withCredentials: true }
       );
@@ -66,7 +67,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   checkAuth: async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/users/me/", {
+      const res = await axios.get(`${API_URL}/users/me/`, {
         withCredentials: true,
       });
       set({ user: transformUser(res.data), isAuthenticated: true, loading: false });

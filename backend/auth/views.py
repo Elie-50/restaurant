@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -13,10 +14,16 @@ class SignUpView(APIView):
         first_name = request.data.get("first_name")
         last_name = request.data.get("last_name")
 
-        if User.objects.filter(email=email).exists():
+        if not email or not username or not password:
+            return Response({"error": "Required fields cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(
+            Q(email=email) |
+            Q(username=username)
+        ).exists():
             return Response({"error": "User already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create_user(email=email, password=password, username=username, last_name=last_name, first_name=first_name)
+        User.objects.create_user(email=email, password=password, username=username, last_name=last_name, first_name=first_name)
         return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
 
