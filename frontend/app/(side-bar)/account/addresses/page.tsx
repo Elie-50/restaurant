@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,17 +6,18 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import AddressCard from "@/components/AddressCard";
 import Spinner from "@/components/Spinner";
-import { API_URL } from "@/lib/constants";
+import { ADDRESSES_URL } from "@/lib/constants";
+import { getCSRFToken } from "@/utils/functions";
 
 type Address = {
   id: string;
   street: string;
-  building: string;
   city: string;
+  building: string;
   floor?: string;
-  createdAt: Date;
   gpsLink?: string;
   imageUrl?: string;
+  createdAt: Date;
 };
 
 type AddressResponse = {
@@ -35,9 +37,25 @@ export default function AddressesPage() {
   const [loading, setLoading] = useState(true);
 
   async function fetchAddresses() {
-    const res = await fetch(`${API_URL}/addresses/`, { credentials: 'include' });
+    const res = await fetch(ADDRESSES_URL, { credentials: "include" });
     const data = await res.json();
-    setAddresses(data);
+
+    // Map snake_case → camelCase
+    const transformed = {
+      ...data,
+      results: data.results.map((a: any) => ({
+        id: a.id,
+        street: a.street,
+        city: a.city,
+        building: a.building,
+        floor: a.floor,
+        gpsLink: a.gps_link || undefined,
+        imageUrl: a.image || undefined,
+        createdAt: new Date(a.created_at),
+      })),
+    };
+
+    setAddresses(transformed);
     setLoading(false);
   }
 
@@ -47,9 +65,19 @@ export default function AddressesPage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Are you sure you want to delete this address?")) return;
+    const csrfToken = getCSRFToken();
 
-    await fetch(`/api/addresses/${id}`, { method: "DELETE" });
-    // setAddresses((prev) => prev.results.filter((a) => a.id !== id));
+    await fetch(`${ADDRESSES_URL}${id}/`, { 
+      method: "DELETE",
+      credentials: 'include',
+      headers: {
+        "X-CSRFToken": csrfToken!,
+      }
+    });
+    setAddresses((prev) => ({
+      ...prev,
+      results: prev.results.filter((a) => a.id !== id),
+    }));
   }
 
 
