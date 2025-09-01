@@ -181,8 +181,9 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="block mb-1 font-semibold">{label}</label>
+      <label htmlFor={label} className="block mb-1 font-semibold">{label}</label>
       <Input
+        id={label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
