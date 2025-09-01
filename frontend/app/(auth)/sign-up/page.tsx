@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ErrorLine from "@/components/ErrorLine";
 import Link from "next/link";
+import { SIGNUP_URL } from "@/lib/constants";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -34,9 +35,8 @@ export default function SignupPage() {
     setError("");
 
     try {
-      // Post to Django backend signup endpoint
       const res = await axios.post(
-        "http://localhost:8000/api/auth/signup/", // replace with your backend URL
+        SIGNUP_URL,
         {
           username:form.username,
           email: form.email,

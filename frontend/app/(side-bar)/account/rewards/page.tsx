@@ -3,6 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { ArrowRightCircle } from "lucide-react";
 import { cookies } from "next/headers";
+import { POINTS_URL } from "@/lib/constants";
 
 async function AccountRewards() {
   let points;
@@ -11,7 +12,7 @@ async function AccountRewards() {
     const cookieStore = cookies();
     const sessionCookie = (await cookieStore).get("sessionid")?.value;
 
-    const res = await fetch("http://localhost:8000/api/users/me/points/", {
+    const res = await fetch(POINTS_URL, {
       headers: {
         cookie: `sessionid=${sessionCookie}`,
       },

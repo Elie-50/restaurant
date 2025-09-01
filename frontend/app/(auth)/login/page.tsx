@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ErrorLine from "@/components/ErrorLine";
 import Link from "next/link";
+import { LOGIN_URL } from "@/lib/constants";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,13 +40,13 @@ export default function LoginPage() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/auth/login/", // Django backend
+        LOGIN_URL,
         {
           username: form.username,
           password: form.password,
         },
         {
-          withCredentials: true, // important: stores session cookie
+          withCredentials: true,
         }
       );
 

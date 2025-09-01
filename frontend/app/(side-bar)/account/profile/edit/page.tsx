@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getCSRFToken } from "@/utils/functions";
-import { API_URL } from "@/lib/constants";
+import { ME_URL } from "@/lib/constants";
 
 export default function EditProfilePage() {
   const { user, setUser } = useAuthStore();
@@ -30,7 +30,7 @@ export default function EditProfilePage() {
     try {
       const newForm = formTransfrom();
       const csrfToken = getCSRFToken();
-      const res = await axios.put(`${API_URL}/users/me/`, newForm, { 
+      const res = await axios.put(ME_URL, newForm, { 
         headers: {
           "X-CSRFToken": csrfToken!,
         },
