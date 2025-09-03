@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "users",
-    "helpers"
+    "helpers",
+    "diet"
 ]
 
 MIDDLEWARE = [

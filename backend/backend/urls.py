@@ -22,7 +22,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),
-    path('api/auth/', include('auth.urls'))
+    path('api/auth/', include('auth.urls')),
+    path('api/dietary-preferences/', include('diet.urls'))
 ]
 
 if settings.DEBUG:
