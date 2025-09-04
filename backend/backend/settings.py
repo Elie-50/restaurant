@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from decouple import config, Csv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,11 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "corsheaders",
-    "rest_framework",
-    "users",
-    "helpers",
-    "diet"
+    'corsheaders',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'users',
+    'helpers',
+    'diet'
 ]
 
 MIDDLEWARE = [
@@ -95,21 +97,6 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = 'users.User'
-
-# SESSION & CSRF COOKIES 
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False       # Change to true in production
-SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
-SESSION_SAVE_EVERY_REQUEST = True
-
-CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SECURE = False          # Change True in production
-CSRF_COOKIE_SAMESITE = "None"
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",        # Next.js dev
-    "http://192.168.10.95:3000",    # Next.js network dev
-]
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = False
@@ -163,12 +150,20 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
 

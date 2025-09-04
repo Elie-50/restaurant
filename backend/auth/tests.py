@@ -1,9 +1,7 @@
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-
-User = get_user_model()
+from users.models import User
 
 class BaseAuthAPITestCase(APITestCase):
     def setUp(self):
@@ -17,7 +15,6 @@ class BaseAuthAPITestCase(APITestCase):
         )
         self.signup_url = reverse("signup")
         self.login_url = reverse("login")
-        self.logout_url = reverse("logout")
 
 
 class SignUpViewTests(BaseAuthAPITestCase):
@@ -80,8 +77,8 @@ class LoginViewTests(BaseAuthAPITestCase):
         }
         response = self.client.post(self.login_url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertIn("error", response.data)
-        self.assertEqual(response.data["error"], "Invalid credentials")
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "No active account found with the given credentials")
 
     def test_login_successful(self):
         payload = {
@@ -90,41 +87,7 @@ class LoginViewTests(BaseAuthAPITestCase):
         }
         response = self.client.post(self.login_url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("message", response.data)
-        self.assertEqual(response.data["message"], "Logged in successfully")
-
-        # Check session contains user id
-        session = self.client.session
-        self.assertIn('_auth_user_id', session)
-        self.assertEqual(session['_auth_user_id'], str(self.existing_user.id))
-
-
-class LogoutViewTests(BaseAuthAPITestCase):
-    def test_logout_without_login(self):
-        response = self.client.post(self.logout_url, {}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["message"], "Logged out successfully")
-
-    def test_logout_after_login(self):
-        # First login
-        payload = {
-            "username": "existinguser",
-            "password": "testpassword123"
-        }
-        login_response = self.client.post(self.login_url, payload, format="json")
-        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
-
-        # Confirm session has user ID
-        session = self.client.session
-        self.assertIn('_auth_user_id', session)
-
-        # Logout
-        response = self.client.post(self.logout_url, {}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["message"], "Logged out successfully")
-
-        # Session should no longer have user ID
-        session = self.client.session
-        self.assertNotIn('_auth_user_id', session)
+        self.assertIn("access", response.data)   # JWT access token
+        self.assertIn("refresh", response.data)  # optional refresh token
 
         

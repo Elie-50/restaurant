@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from auth.tests import BaseAuthAPITestCase
+from helpers.tests import get_jwt_token
 from users.models import User
 from users.models import Address
 from helpers.utils import create_dummy_image
@@ -15,11 +16,12 @@ class MeViewTests(BaseAuthAPITestCase):
     # -------------------- GET /me/ --------------------
     def test_get_me_unauthenticated(self):
         response = self.client.get(self.me_url, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_me_authenticated(self):
         # Login first
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         response = self.client.get(self.me_url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.data
@@ -31,10 +33,11 @@ class MeViewTests(BaseAuthAPITestCase):
     def test_put_me_unauthenticated(self):
         payload = {"first_name": "Updated", "last_name": "Name"}
         response = self.client.put(self.me_url, payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_put_me_authenticated_valid_data(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         payload = {
             "first_name": "UpdatedFirst",
             "last_name": "UpdatedLast",
@@ -54,7 +57,8 @@ class MeViewTests(BaseAuthAPITestCase):
         self.assertEqual(self.existing_user.phone_number, payload["phone_number"])
 
     def test_put_me_authenticated_invalid_data(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         payload = {
             "email": "invalid-email-format",  # invalid email
         }
@@ -73,10 +77,11 @@ class PointViewTests(BaseAuthAPITestCase):
     # -------------------- GET /me/points/ --------------------
     def test_get_points_unauthenticated(self):
         response = self.client.get(self.points_url, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_points_authenticated(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         response = self.client.get(self.points_url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.data
@@ -115,16 +120,17 @@ class AddressViewSetTests(BaseAuthAPITestCase):
     # -------------------- Unauthenticated --------------------
     def test_list_unauthenticated(self):
         response = self.client.get(self.address_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_unauthenticated(self):
         payload = {"street": "New Street", "city": "CityC", "building": "B3", "floor": "3"}
         response = self.client.post(self.address_url, payload)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     # -------------------- List --------------------
     def test_list_authenticated(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         response = self.client.get(self.address_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
@@ -134,7 +140,8 @@ class AddressViewSetTests(BaseAuthAPITestCase):
 
     # -------------------- Retrieve --------------------
     def test_retrieve_own_address(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("address-detail", args=[self.address1.id])
 
         response = self.client.get(url)
@@ -142,14 +149,16 @@ class AddressViewSetTests(BaseAuthAPITestCase):
         self.assertEqual(response.data["street"], self.address1.street)
 
     def test_retrieve_other_user_address(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("address-detail", args=[self.address2.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # -------------------- Create --------------------
     def test_create_address_valid(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         payload = {
             "street": "New Street",
             "city": "CityC",
@@ -166,7 +175,8 @@ class AddressViewSetTests(BaseAuthAPITestCase):
         self.assertEqual(Address.objects.get(id=response.data["id"]).user, self.existing_user)
 
     def test_create_address_missing_required_field(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         payload = {
             "city": "CityC",
             "building": "B3",
@@ -178,7 +188,8 @@ class AddressViewSetTests(BaseAuthAPITestCase):
 
     # -------------------- Update --------------------
     def test_update_own_address_partial(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("address-detail", args=[self.address1.id])
         payload = {"street": "Updated Street"}
 
@@ -188,7 +199,8 @@ class AddressViewSetTests(BaseAuthAPITestCase):
         self.assertEqual(self.address1.street, payload["street"])
 
     def test_update_other_user_address(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("address-detail", args=[self.address2.id])
         payload = {"street": "Hacked Street"}
 
@@ -198,7 +210,8 @@ class AddressViewSetTests(BaseAuthAPITestCase):
         self.assertNotEqual(self.address2.street, "Hacked Street")
 
     def test_update_image_field(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("address-detail", args=[self.address1.id])
 
         payload = {
@@ -215,7 +228,8 @@ class AddressViewSetTests(BaseAuthAPITestCase):
 
     # -------------------- Delete --------------------
     def test_delete_own_address(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("address-detail", args=[self.address1.id])
 
         response = self.client.delete(url)
@@ -223,7 +237,8 @@ class AddressViewSetTests(BaseAuthAPITestCase):
         self.assertFalse(Address.objects.filter(id=self.address1.id).exists())
 
     def test_delete_other_user_address(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("address-detail", args=[self.address2.id])
         
         response = self.client.delete(url)
@@ -238,7 +253,8 @@ class UserPreferencesTests(APITestCase):
             email="testuser@example.com",
             password="password123",
         )
-        self.client.force_login(self.user)
+        token = get_jwt_token(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         # Create some dietary preferences
         self.pref1 = DietaryPreference.objects.create(label="Vegan")
@@ -300,11 +316,11 @@ class UserPreferencesTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_unauthenticated_access(self):
-        """Requests without login return 403"""
+        """Requests without login return 401"""
         self.client.logout()
         res_get = self.client.get(self.url)
         res_post = self.client.post(self.url, {"id": self.pref1.id})
         res_delete = self.client.delete(self.url, {"id": self.pref1.id})
-        self.assertEqual(res_get.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(res_post.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(res_delete.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res_get.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res_post.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res_delete.status_code, status.HTTP_401_UNAUTHORIZED)

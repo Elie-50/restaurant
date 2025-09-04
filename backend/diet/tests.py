@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from auth.tests import BaseAuthAPITestCase
+from helpers.tests import get_jwt_token
 from users.models import User
 from .models import DietaryPreference
 
@@ -20,15 +21,17 @@ class DietViewSetTest(BaseAuthAPITestCase):
     
     def test_list_reject_unauthenticated(self):
         response = self.client.get(self.diet_url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_accept_authenticated_non_admin(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         response = self.client.get(self.diet_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_reject_non_admin_unsafe_methods(self):
-        self.client.force_login(self.existing_user)
+        token = get_jwt_token(self.existing_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("dietary-preferences-detail", args=[self.diet_option.id])
 
         payload = { "label": "Option B" }
@@ -40,7 +43,8 @@ class DietViewSetTest(BaseAuthAPITestCase):
         self.assertEqual(put_response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_accept_admin_unsafe_methods(self):
-        self.client.force_login(self.admin_user)
+        token = get_jwt_token(self.admin_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         url = reverse("dietary-preferences-detail", args=[self.diet_option.id])
 
         payload = { "label": "Option B" }
@@ -53,7 +57,8 @@ class DietViewSetTest(BaseAuthAPITestCase):
         self.assertEqual(put_response.status_code, status.HTTP_200_OK)
 
     def test_reject_duplicate_values(self):
-        self.client.force_login(self.admin_user)
+        token = get_jwt_token(self.admin_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         payload = { "label": "Option 1" }
 
