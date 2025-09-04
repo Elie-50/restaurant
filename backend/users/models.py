@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from helpers.models import BaseModeUUID
+from diet.models import DietaryPreference
 
 # Create your models here.
 class User(AbstractUser):
@@ -9,6 +10,8 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=20, null=False, default='', blank=True) 
     is_verified = models.BooleanField(default=False)
     points = models.IntegerField(default=0, null=False)
+
+    diet_preferences = models.ManyToManyField(DietaryPreference, blank=True, related_name="users")
 
 class Address(BaseModeUUID):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")

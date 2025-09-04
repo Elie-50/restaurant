@@ -1,8 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import Address
-
-User = get_user_model()
+from .models import Address, User
+from diet.serializers import DietaryPreferenceSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,7 +21,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Address
         fields = ["id", "street", "city", "building", "floor", "gps_link", "image", "created_at"]

@@ -9,4 +9,5 @@ urlpatterns = [
     path('me/addresses/', include(router.urls)),
     path('me/', MeView.as_view(), name='me'),
     path('me/points/', PointView.as_view(), name='points'),
+    path('me/dietary-preferences/', PreferencesView.as_view(), name='user-preferences'),
 ]

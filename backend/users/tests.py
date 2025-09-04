@@ -4,7 +4,8 @@ from auth.tests import BaseAuthAPITestCase
 from users.models import User
 from users.models import Address
 from helpers.utils import create_dummy_image
-
+from diet.models import DietaryPreference
+from rest_framework.test import APITestCase
 
 class MeViewTests(BaseAuthAPITestCase):
     def setUp(self):
@@ -228,3 +229,82 @@ class AddressViewSetTests(BaseAuthAPITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Address.objects.filter(id=self.address2.id).exists())
+
+class UserPreferencesTests(APITestCase):
+    def setUp(self):
+        # Create user and login
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="testuser@example.com",
+            password="password123",
+        )
+        self.client.force_login(self.user)
+
+        # Create some dietary preferences
+        self.pref1 = DietaryPreference.objects.create(label="Vegan")
+        self.pref2 = DietaryPreference.objects.create(label="Gluten-Free")
+
+        # URL
+        self.url = reverse("user-preferences")
+
+    def test_get_preferences_empty(self):
+        """GET returns empty list if user has no preferences"""
+        res = self.client.get(self.url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, [])
+
+    def test_get_preferences_with_target_user(self):
+        """GET with query param id returns another user's prefs"""
+        other_user = User.objects.create_user(
+            username="otheruser", email="other@example.com", password="pass"
+        )
+        other_user.diet_preferences.add(self.pref1)
+        res = self.client.get(self.url, {"id": other_user.id})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]["id"], str(self.pref1.id))
+
+    def test_post_add_preference(self):
+        """POST adds a preference to the authenticated user"""
+        res = self.client.post(self.url, {"id": self.pref1.id}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertIn(self.pref1, self.user.diet_preferences.all())
+
+    def test_post_missing_id(self):
+        """POST without id returns 400"""
+        res = self.client.post(self.url, {}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data["detail"], "id is required.")
+
+    def test_post_invalid_id(self):
+        """POST with non-existent preference returns 404"""
+        res = self.client.post(self.url, {"id": 9999}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_preference(self):
+        """DELETE removes a preference"""
+        self.user.diet_preferences.add(self.pref2)
+        res = self.client.delete(self.url, {"id": self.pref2.id}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertNotIn(self.pref2, self.user.diet_preferences.all())
+
+    def test_delete_missing_id(self):
+        """DELETE without id returns 400"""
+        res = self.client.delete(self.url, {}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data["detail"], "id is required.")
+
+    def test_delete_invalid_id(self):
+        """DELETE with non-existent preference returns 404"""
+        res = self.client.delete(self.url, {"id": 9999}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_unauthenticated_access(self):
+        """Requests without login return 403"""
+        self.client.logout()
+        res_get = self.client.get(self.url)
+        res_post = self.client.post(self.url, {"id": self.pref1.id})
+        res_delete = self.client.delete(self.url, {"id": self.pref1.id})
+        self.assertEqual(res_get.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res_post.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res_delete.status_code, status.HTTP_403_FORBIDDEN)
