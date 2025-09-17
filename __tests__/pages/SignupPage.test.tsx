@@ -1,10 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import SignupPage from "@/app/(auth)/sign-up/page";
-import axios from "axios";
+import SignupPage from "@/app/(auth)/signup/page";
 import { useRouter } from "next/navigation";
 
-jest.mock("axios");
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
@@ -66,33 +65,41 @@ describe("SignupPage", () => {
   });
 
   it("submits form and redirects on success", async () => {
-    (axios.post as jest.Mock).mockResolvedValueOnce({ status: 201 });
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ message: "User created" }),
+    } as any);
 
     fillForm();
     const { submit } = getFields();
     fireEvent.click(submit);
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(
-        expect.any(String),
-        {
-          username: "testuser",
-          email: "user@example.com",
-          password: "password123",
-          first_name: "Test",
-          last_name: "User",
-        },
-        { withCredentials: true }
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/auth/signup",
+        expect.objectContaining({
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: "testuser",
+            email: "user@example.com",
+            password: "password123",
+            firstName: "Test",
+            lastName: "User",
+          }),
+        })
       );
       expect(pushMock).toHaveBeenCalledWith("/login");
     });
   });
 
   it("shows error on failed signup", async () => {
-    (axios.post as jest.Mock).mockRejectedValueOnce({
-      response: { data: { error: "User already exists" } },
-    });
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: "User already exists" }),
+    } as any);
 
+    fillForm();
     const { submit } = getFields();
     fireEvent.click(submit);
 

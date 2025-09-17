@@ -1,26 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
-/* eslint-disable react/display-name */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react/display-name */
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import EditAddressPage from "@/app/(side-bar)/account/addresses/[id]/page";
 import { useRouter } from "next/navigation";
-import { ADDRESSES_URL } from "@/lib/constants";
+import api from "@/lib/axios";
 
 // Mock Next.js Image (so <Image> works in Jest)
-jest.mock("next/image", () => {
-  return (props: any) => <img {...props} alt={props.alt || "image"} />;
-});
+jest.mock("next/image", () => (props: any) => <img {...props} alt={props.alt || "image"} />);
 
 // Mock router
-jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(),
-}));
+jest.mock("next/navigation", () => ({ useRouter: jest.fn() }));
 
-// Mock CSRF
-jest.mock("@/utils/functions", () => ({
-  getCSRFToken: jest.fn(() => "test-csrf-token"),
-}));
+// Mock axios
+jest.mock("@/lib/axios");
+
 jest.mock("@/components/Spinner", () => () => <div data-testid="spinner">Loading...</div>);
 
 describe("EditAddressPage", () => {
@@ -37,31 +32,24 @@ describe("EditAddressPage", () => {
     expect(screen.getByRole("button", { name: /add address/i })).toBeInTheDocument();
   });
 
-  it("renders spinner while loading existing address", async () => {
-    // Mock fetch for edit case
-    (global.fetch as jest.Mock) = jest.fn(() =>
-      new Promise(() => {}) // never resolves
-    ) as any;
-
+  it("renders spinner while loading existing address", () => {
+    (api.get as jest.Mock).mockImplementation(() => new Promise(() => {}));
     render(<EditAddressPage params={{ id: "123" }} />);
     expect(screen.getByTestId("spinner")).toBeInTheDocument();
   });
 
   it("loads existing address and displays values", async () => {
-    (global.fetch as jest.Mock) = jest.fn(() =>
-      Promise.resolve({
-        json: () =>
-          Promise.resolve({
-            id: "123",
-            street: "Oxford",
-            building: "University",
-            city: "London",
-            floor: "2",
-            gps_link: "http://maps.example.com",
-            image: "http://example.com/img.jpg",
-          }),
-      })
-    ) as any;
+    (api.get as jest.Mock).mockResolvedValueOnce({
+      data: {
+        _id: "123",
+        street: "Oxford",
+        building: "University",
+        city: "London",
+        floor: "2",
+        gpsLink: "http://maps.example.com",
+        image: "http://example.com/img.jpg",
+      },
+    });
 
     render(<EditAddressPage params={{ id: "123" }} />);
 
@@ -75,7 +63,7 @@ describe("EditAddressPage", () => {
   });
 
   it("submits new address with POST", async () => {
-    (global.fetch as jest.Mock) = jest.fn().mockResolvedValue({ ok: true });
+    (api.post as jest.Mock).mockResolvedValueOnce({});
 
     render(<EditAddressPage params={{ id: "new" }} />);
 
@@ -86,36 +74,25 @@ describe("EditAddressPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /add address/i }));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        `${ADDRESSES_URL}`,
-        expect.objectContaining({
-          method: "POST",
-          credentials: "include",
-          headers: { "X-CSRFToken": "test-csrf-token" },
-        })
-      );
+      expect(api.post).toHaveBeenCalledWith("/api/users/me/addresses", expect.any(FormData));
       expect(pushMock).toHaveBeenCalledWith("/account/addresses");
     });
   });
 
   it("submits edited address with PUT", async () => {
-    (global.fetch as jest.Mock).mockImplementation((url, options) => {
-      if (options?.method === "PUT") {
-        return Promise.resolve({ ok: true });
-      }
-      return Promise.resolve({
-        json: () =>
-          Promise.resolve({
-            id: "123",
-            street: "Oxford",
-            building: "University",
-            city: "London",
-            floor: "",
-            gps_link: "",
-            image: "",
-          }),
-      });
+    (api.get as jest.Mock).mockResolvedValueOnce({
+      data: {
+        _id: "123",
+        street: "Oxford",
+        building: "University",
+        city: "London",
+        floor: "",
+        gpsLink: "",
+        image: "",
+      },
     });
+
+    (api.put as jest.Mock).mockResolvedValueOnce({});
 
     render(<EditAddressPage params={{ id: "123" }} />);
 
@@ -127,14 +104,7 @@ describe("EditAddressPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /update address/i }));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        `${ADDRESSES_URL}123/`,
-        expect.objectContaining({
-          method: "PUT",
-          credentials: "include",
-          headers: { "X-CSRFToken": "test-csrf-token" },
-        })
-      );
+      expect(api.put).toHaveBeenCalledWith("/api/users/me/addresses/123", expect.any(FormData));
       expect(pushMock).toHaveBeenCalledWith("/account/addresses");
     });
   });

@@ -55,7 +55,6 @@ describe("ProfilePage", () => {
         username: "janedoe",
         email: "jane@example.com",
         phoneNumber: "1234567890",
-        role: "admin",
         isVerified: true,
       },
       checkAuth: checkAuthMock,
@@ -66,13 +65,12 @@ describe("ProfilePage", () => {
     render(<ProfilePage />);
 
     expect(screen.getByText("Jane Doe")).toBeInTheDocument();
-    expect(screen.getByText("admin")).toBeInTheDocument();
     expect(screen.getByText("janedoe")).toBeInTheDocument();
     expect(screen.getByText("jane@example.com")).toBeInTheDocument();
     expect(screen.getByText("1234567890")).toBeInTheDocument();
     expect(screen.getByText("Yes")).toBeInTheDocument();
 
-    // Button should navigate
+    // Edit button should navigate
     fireEvent.click(screen.getByRole("button", { name: /edit profile/i }));
     expect(pushMock).toHaveBeenCalledWith("/account/profile/edit");
   });
@@ -85,7 +83,6 @@ describe("ProfilePage", () => {
         username: null,
         email: null,
         phoneNumber: null,
-        role: "Customer",
         isVerified: false,
       },
       checkAuth: checkAuthMock,
@@ -95,7 +92,8 @@ describe("ProfilePage", () => {
 
     render(<ProfilePage />);
 
+    // Should show "—" for missing fields
     expect(screen.getAllByText("—")).toHaveLength(3); // username, email, phoneNumber
-    expect(screen.getByText("No")).toBeInTheDocument();
+    expect(screen.getByText("No")).toBeInTheDocument(); // verification
   });
 });

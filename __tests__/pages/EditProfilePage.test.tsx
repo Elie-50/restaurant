@@ -4,8 +4,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import EditProfilePage from "@/app/(side-bar)/account/profile/edit/page";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
-import axios from "axios";
-import * as functions from "@/utils/functions";
+import api from "@/lib/axios";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -13,9 +12,8 @@ jest.mock("next/navigation", () => ({
 jest.mock("@/store/auth", () => ({
   useAuthStore: jest.fn(),
 }));
-jest.mock("axios");
-jest.mock("@/utils/functions", () => ({
-  getCSRFToken: jest.fn(() => "test-csrf-token"),
+jest.mock("@/lib/axios", () => ({
+  put: jest.fn(),
 }));
 
 describe("EditProfilePage", () => {
@@ -29,7 +27,6 @@ describe("EditProfilePage", () => {
       user: { firstName: "Jane", lastName: "Doe", phoneNumber: "1234567890" },
       setUser: setUserMock,
     });
-    jest.spyOn(functions, "getCSRFToken").mockReturnValue("test-csrf-token");
     // mock alert
     global.alert = jest.fn();
   });
@@ -59,7 +56,7 @@ describe("EditProfilePage", () => {
   });
 
   it("submits form successfully", async () => {
-    (axios.put as jest.Mock).mockResolvedValueOnce({
+    (api.put as jest.Mock).mockResolvedValueOnce({
       data: { user: { firstName: "John", lastName: "Smith", phoneNumber: "0987654321" } },
     });
 
@@ -72,14 +69,13 @@ describe("EditProfilePage", () => {
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
-      expect(axios.put).toHaveBeenCalledWith(
+      expect(api.put).toHaveBeenCalledWith(
         expect.any(String),
         {
-          first_name: "John",
-          last_name: "Smith",
-          phone_number: "0987654321",
-        },
-        { headers: { "X-CSRFToken": "test-csrf-token" }, withCredentials: true }
+          firstName: "John",
+          lastName: "Smith",
+          phoneNumber: "0987654321",
+        }
       );
       expect(setUserMock).toHaveBeenCalledWith({
         firstName: "John",
@@ -91,7 +87,7 @@ describe("EditProfilePage", () => {
   });
 
   it("handles failed submit with alert", async () => {
-    (axios.put as jest.Mock).mockRejectedValueOnce(new Error("Failed"));
+    (api.put as jest.Mock).mockRejectedValueOnce(new Error("Failed"));
 
     render(<EditProfilePage />);
 

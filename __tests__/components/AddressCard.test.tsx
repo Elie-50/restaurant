@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
-import AddressCard from "@/components/AddressCard";
+import AddressCard from "@/components/server/AddressCard";
 
 // Mock Next.js Link & Image
 jest.mock("next/link", () => {
