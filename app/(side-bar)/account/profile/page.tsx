@@ -36,7 +36,7 @@ export default async function ProfilePage() {
 
       <div className="mt-6 flex justify-end">
         <Button>
-          <Link href={'/profile/edit'}>
+          <Link href={'/account/profile/edit'}>
             Edit Profile
           </Link>
           

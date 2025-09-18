@@ -4,7 +4,9 @@ import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import api from "@/lib/axios";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { updateUser } from "@/redux/slices/authSlice";
+import ErrorLine from "../server/ErrorLine";
 
 type User = {
   firstName: string;
@@ -14,25 +16,21 @@ type User = {
 
 export default function UpdateProfileForm({ user }: { user: User }) {
   const router = useRouter();
-  const [form, setForm] = useState({
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.auth)
+
+  const [form, setForm] = useState<User>({
     firstName: user.firstName || "",
     lastName: user.lastName || "",
     phoneNumber: user.phoneNumber || "",
   });
-  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setLoading(true);
+    const data = await dispatch(updateUser(form));
 
-    try {
-      await api.put("/api/users/me", form);
-      router.push("/account/profile");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update profile.");
-    } finally {
-      setLoading(false);
+    if (data.meta.requestStatus === 'fulfilled') {
+      router.push('/account/profile');
     }
   }
 
@@ -61,6 +59,9 @@ export default function UpdateProfileForm({ user }: { user: User }) {
             onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
           />
         </div>
+        {
+          error && <ErrorLine text={error} />
+        }
 
         <div className="flex flex-col gap-2">
           <Button type="submit" disabled={loading}>
