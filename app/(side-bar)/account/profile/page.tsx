@@ -1,4 +1,4 @@
-import { getCurrentUser, getUserFromCookies } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import * as react from "react";
 import { User, Mail, Phone, UserCircle, LucideProps } from "lucide-react";
 import { Button } from "@/components/ui/button";
