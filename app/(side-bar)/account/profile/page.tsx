@@ -3,6 +3,8 @@ import * as react from "react";
 import { User, Mail, Phone, UserCircle, LucideProps } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import Image from "next/image";
 
 type Icon = react.ForwardRefExoticComponent<
   Omit<LucideProps, "ref"> & react.RefAttributes<SVGSVGElement>
@@ -12,14 +14,24 @@ export default async function ProfilePage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    return <div className="p-6 text-center">You must be logged in to view this page.</div>;
+    redirect('/login');
   }
 
   return (
     <div className="mx-auto p-6 bg-white rounded-2xl shadow max-w-md">
       <h2 className="page-header">Profile</h2>
       <div className="flex items-center gap-4 mb-6">
-        <UserCircle className="h-12 w-12 text-gray-500" />
+        {user.avatar ? (
+          <Image
+            width={150}
+            height={150}
+            src={user.avatar}
+            alt={`${user.firstName} ${user.lastName}`}
+            className="h-12 w-12 rounded-full object-cover"
+          />
+        ) : (
+          <UserCircle className="h-12 w-12 text-gray-500" />
+        )}
         <div>
           <h1 className="text-2xl font-bold">
             {user.firstName} {user.lastName}

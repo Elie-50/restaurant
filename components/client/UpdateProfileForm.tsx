@@ -12,6 +12,7 @@ type UpdateUserFormType = {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  avatar: string | File | null;
 };
 
 export default function UpdateProfileForm({ user }: { user: UpdateUserFormType }) {
@@ -20,9 +21,10 @@ export default function UpdateProfileForm({ user }: { user: UpdateUserFormType }
   const { loading, error } = useAppSelector((state) => state.auth)
   
   const [form, setForm] = useState<UpdateUserFormType>({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    phoneNumber: user?.phoneNumber || "",
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    phoneNumber: user.phoneNumber || "",
+    avatar: user.avatar || null
   });
 
   async function handleSubmit(e: FormEvent) {
@@ -58,6 +60,16 @@ export default function UpdateProfileForm({ user }: { user: UpdateUserFormType }
             value={form.phoneNumber}
             onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
           />
+        </div>
+        <div>
+            <label className="block text-sm text-gray-600">Avatar</label>
+            <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                setForm({ ...form, avatar: e.target.files?.[0] || null })
+                }
+            />
         </div>
         {
           error && <ErrorLine text={error} />

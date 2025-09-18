@@ -48,11 +48,13 @@ export function NavUser({
   const dispacth = useAppDispatch();
   const router = useRouter();
 
+  console.log(user.avatar);
+
   const handleLogout = async () => {
     const res = await dispacth(logoutUser());
 
     if (res.meta.requestStatus == 'fulfilled') {
-      window.location.href = "/login";
+      router.push('/login');
     }
   };
 

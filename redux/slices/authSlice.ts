@@ -62,11 +62,21 @@ export const logoutUser = createAsyncThunk<
 
 export const updateUser = createAsyncThunk<
   void,
-  { firstName: string; lastName: string; phoneNumber: string; },
+  { firstName: string; lastName: string; phoneNumber: string; avatar?: string | File | null },
   { rejectValue: string }
 > ("auth/updateUser", async (credentials, thunkAPI) => {
   try {
-    await api.put("/users/me", credentials)
+    const formData = new FormData();
+    formData.append("firstName", credentials.firstName);
+    formData.append("lastName", credentials.lastName);
+    formData.append("phoneNumber", credentials.phoneNumber);
+    if (credentials.avatar && typeof credentials.avatar != 'string') {
+      formData.append("avatar", credentials.avatar);
+    }
+
+    await api.put("/users/me", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   } catch (err: unknown) {
     const error = err as AxiosError<{ error?: string }>
     return thunkAPI.rejectWithValue(error?.response?.data?.error || 'Unexpected Error Occured');
