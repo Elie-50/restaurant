@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 254 }).notNull().unique(),
   password: varchar("password", { length: 128 }).notNull(),
   phoneNumber: varchar("phone_number", { length: 20 }).default("").notNull(),
+  avatar: varchar("avatar", { length: 255 }).default("").notNull(),
   role: roleEnum("role").notNull().default("customer"),
   createdAt: timestamp("created_at")
     .notNull()
@@ -18,3 +19,17 @@ export const users = pgTable("users", {
   points: integer("points").default(0).notNull(),
 
 });
+
+export type UserTable =  {
+  role: "admin" | "cashier" | "customer" | "delivery";
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  createdAt: Date;
+  points: number;
+  avatar: string;
+};

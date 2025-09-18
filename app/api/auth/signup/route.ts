@@ -19,10 +19,21 @@ export async function POST(req: Request) {
     lastName,
     email,
     password: hash,
-  }).returning({ id: users.id });
+  })
+  .returning({ 
+    id: users.id,
+    username: users.username,
+    firstName: users.firstName,
+    lastName: users.lastName,
+    email: users.email,
+    role: users.role,
+    phoneNumber: users.phoneNumber,
+    createdAt: users.createdAt,
+    points: users.points
+  });
 
   const token = signToken(newUser.id);
-  const res = NextResponse.json({ success: true });
+  const res = NextResponse.json({ user: newUser });
   setAuthCookie(res, token);
   return res;
 }

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users, UserTable } from "@/db/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
@@ -8,19 +8,7 @@ import { NextResponse } from "next/server";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
-const userCache = new Map<string, Partial<User>>();
-
-type User = {
-  id: string;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: 'admin' | "cashier" | "customer" | "delivery";
-  phoneNumber: string;
-  createdAt: Date;
-  points: number;
-};
+type User = Omit<UserTable, "password">;
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 10);
@@ -52,21 +40,24 @@ export async function setAuthCookie(res: NextResponse, token: string) {
 }
 
 export async function clearAuthCookie() {
-  (await cookies()).set("token", "", { httpOnly: true, path: "/", maxAge: 0 });
+  const cookieStore = await cookies();
+  
+  cookieStore.set("token", "", { httpOnly: true, path: "/", maxAge: 0 });
+
+  console.log(cookieStore);
 }
 
 export async function getUserFromCookies() {
   const token = (await cookies()).get("token")?.value;
   if (!token) return null;
   const payload = verifyToken(token);
+  console.log(payload);
   return payload?.sub ?? null;
 }
 
 export async function getCurrentUser(): Promise<User | null> {
   const token = (await cookies()).get("token")?.value;
   if (!token) return null;
-
-  if (userCache.has(token)) return userCache.get(token)! as User;
 
   try {
     const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
@@ -82,13 +73,13 @@ export async function getCurrentUser(): Promise<User | null> {
         phoneNumber: users.phoneNumber,
         createdAt: users.createdAt,
         points: users.points,
+        avatar: users.avatar
       })
       .from(users)
       .where(eq(users.id, payload.sub));
 
     if (!user) return null;
 
-    userCache.set(token, user);
     return user;
   } catch {
     return null;

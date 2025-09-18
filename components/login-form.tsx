@@ -1,18 +1,42 @@
+"use client";
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { login } from "@/lib/actions/login"
-
+import { useAppDispatch, useAppSelector } from "@/redux/hooks"
+import { useState } from "react";
+import { loginUser } from "@/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
+import ErrorLine from "./server/ErrorLine";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await dispatch(loginUser(loginForm));
+    
+    if (res.meta.requestStatus == 'fulfilled') {
+      router.push('/account/profile/');
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
+  }
+
   return (
-    <form 
-      action={login} 
+    <form
+      onSubmit={handleSubmit}
       className={cn("flex flex-col gap-6", className)} 
       {...props}
     >
@@ -25,7 +49,15 @@ export function LoginForm({
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+          <Input
+            id="email"
+            name="email"
+            value={loginForm.email}
+            onChange={handleInputChange}
+            type="email"
+            placeholder="m@example.com"
+            required
+          />
         </div>
         <div className="grid gap-3">
           <div className="flex items-center">
@@ -37,11 +69,22 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input placeholder="Password" name="password" id="password" type="password" required />
+          <Input
+            placeholder="Password"
+            name="password"
+            id="password"
+            type="password"
+            required
+            value={loginForm.password}
+            onChange={handleInputChange} 
+          />
         </div>
         <Button type="submit" className="w-full">
-          Login
+          { loading ? 'Loggin in...' : 'Login' }
         </Button>
+        {
+          error && <ErrorLine text={error} />
+        }
         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-background text-muted-foreground relative z-10 px-2">
             Or continue with

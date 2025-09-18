@@ -1,14 +1,14 @@
 import UpdateProfileForm from "@/components/client/UpdateProfileForm";
 import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default async function EditProfilePage() {
+async function EditProfilePage() {
   const user = await getCurrentUser();
-
+  
   if (!user) {
-    return <div className="p-6 text-center">You must be logged in to edit your profile.</div>;
+    redirect('/login');
   }
-
-  const { firstName, lastName, phoneNumber } = user;
-
-  return <UpdateProfileForm user={{ firstName, lastName, phoneNumber }} />;
+  return <UpdateProfileForm user={user} />
 }
+
+export default EditProfilePage

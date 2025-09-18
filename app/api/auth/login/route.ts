@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users, UserTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { verifyPassword, signToken, setAuthCookie } from "@/lib/auth";
 
@@ -21,7 +21,8 @@ export async function POST(req: Request) {
   }
 
   const token = signToken(user.id);
-  const res = NextResponse.json({ success: true });
+  const data = user as Omit<UserTable, "password">;
+  const res = NextResponse.json({ success: true, user: data });
   setAuthCookie(res, token);
   return res;
 }

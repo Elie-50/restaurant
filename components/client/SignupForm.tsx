@@ -4,11 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import ErrorLine from "@/components/server/ErrorLine";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { signup } from "@/redux/slices/authSlice";
 
-export default function SignupForm() {
+export default function SignupForm({
+  className,
+  ...props
+}: React.ComponentProps<"form">) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.auth);
   
   const [form, setForm] = useState({
     username: "",
@@ -18,8 +27,6 @@ export default function SignupForm() {
     lastName: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,103 +34,99 @@ export default function SignupForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    
+    const res = await dispatch(signup(form));
 
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-      credentials: 'include'
-    });
-
-    setLoading(false);
-
-    if (res.ok) {
-      router.push("/");
-    } else {
-      const data = await res.json();
-      setError(data.error || "Signup failed");
+    if (res.meta.requestStatus == 'fulfilled') {
+      router.push('/account/profile');
     }
   }
 
   return (
-    <Card className="w-full max-w-sm mx-auto">
-      <CardHeader>
-        <CardTitle className="text-xl text-center">Sign Up</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label className="py-2" htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              name="username"
-              placeholder="Username"
-              value={form.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <Label className="py-2" htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <Label className="py-2" htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="flex gap-2">
-            <div className="w-1/2">
-                <Label className="py-2 px-1" htmlFor="firstName">First Name</Label>
-                <Input
-                data-testid="firstname-input"
-                name="firstName"
-                placeholder="First Name"
-                value={form.firstName}
-                onChange={handleChange}
-            />
-            </div>
-            <div className="w-1/2">
-                <Label className="py-2 px-1" htmlFor="lastName">Last Name</Label>
-                <Input
-                    data-testid="lastname-input"
-                    name="lastName"
-                    placeholder="Last Name"
-                    value={form.lastName}
-                    onChange={handleChange}
-                />
-            </div>
+    <form
+      onSubmit={handleSubmit}
+      className={cn("flex flex-col gap-6", className)} 
+      {...props}
+    >
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-2xl font-bold">Create to your account</h1>
+      </div>
+      <div className="grid gap-6">
+        <div className="grid gap-3">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            placeholder="Username"
+            name="username"
+            id="username"
+            type="username"
+            required
+            value={form.username}
+            onChange={handleChange} 
+          />
         </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Sign Up"}
-          </Button>
-        </form>
-        <p className="text-sm text-center mt-4">
-          Already have an account?{" "}
-          <a href="/login" className="underline">
-            Login
-          </a>
-        </p>
-      </CardContent>
-    </Card>
+        <div className="grid gap-3">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            type="email"
+            placeholder="m@example.com"
+            required
+          />
+        </div>
+        <div className="grid gap-3">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            placeholder="Password"
+            name="password"
+            id="password"
+            type="password"
+            required
+            value={form.password}
+            onChange={handleChange} 
+          />
+        </div>
+        <div className="flex flex-row gap-2">
+          <div className="grid gap-3 w-1/2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              placeholder="First Name"
+              name="firstName"
+              id="firstName"
+              type="firstName"
+              required
+              value={form.firstName}
+              onChange={handleChange} 
+            />
+          </div>
+          <div className="grid gap-3 w-1/2">
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              placeholder="Last Name"
+              name="lastName"
+              id="lastName"
+              type="lastName"
+              required
+              value={form.lastName}
+              onChange={handleChange} 
+            />
+          </div>
+        </div>
+        <Button type="submit" className="w-full">
+          { loading ? 'Signing up...' : 'Sign Up' }
+        </Button>
+        {
+          error && <ErrorLine text={error} />
+        }
+      </div>
+      <div className="text-center text-sm">
+        Already have an account?{" "}
+        <Link href="/login" className="underline underline-offset-4">
+          Login
+        </Link>
+      </div>
+    </form>
   );
 }

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import SignupForm from "@/components/client/SignupForm";
+import { LoginForm } from "@/components/login-form";
 import { getUserFromCookies } from "@/lib/auth";
 
-export default async function SignupPage() {
+export default async function LoginPage() {
   const token = await getUserFromCookies();
 
   if (token) {
@@ -11,7 +11,7 @@ export default async function SignupPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <SignupForm />
+      <LoginForm />
     </div>
   );
 }

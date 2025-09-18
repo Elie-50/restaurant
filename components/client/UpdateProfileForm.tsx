@@ -6,23 +6,23 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { updateUser } from "@/redux/slices/authSlice";
-import ErrorLine from "../server/ErrorLine";
+import ErrorLine from "@/components/server/ErrorLine";
 
-type User = {
+type UpdateUserFormType = {
   firstName: string;
   lastName: string;
   phoneNumber: string;
 };
 
-export default function UpdateProfileForm({ user }: { user: User }) {
+export default function UpdateProfileForm({ user }: { user: UpdateUserFormType }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth)
-
-  const [form, setForm] = useState<User>({
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    phoneNumber: user.phoneNumber || "",
+  
+  const [form, setForm] = useState<UpdateUserFormType>({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    phoneNumber: user?.phoneNumber || "",
   });
 
   async function handleSubmit(e: FormEvent) {

@@ -3,30 +3,20 @@ import { ReactNode } from "react";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      {/* Left side: form */}
-      <div className="flex flex-col items-center justify-center p-6 bg-transparent">
-        <h1 className="text-3xl font-bold mb-2 hidden lg:block"></h1>
-        <div className="w-full max-w-md">{children}</div>
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            { children }
+          </div>
+        </div>
       </div>
-
-      {/* Right side: image */}
-      <div className="hidden lg:block relative">
+      <div className="bg-muted relative hidden lg:block">
         <Image
           src="/mashewe.jpg"
-          alt="Auth background"
           fill
-          className="object-cover rounded-tl-3xl rounded-bl-3xl"
-        />
-      </div>
-
-      {/* Mobile background */}
-      <div className="lg:hidden absolute inset-0 -z-10">
-        <Image
-          src="/mashewe.jpg"
-          alt="Auth background"
-          fill
-          className="object-cover"
+          alt="Image"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>
     </div>

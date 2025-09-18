@@ -19,3 +19,10 @@ export async function PUT(req: NextRequest) {
 
   return NextResponse.json({ user: updatedUser[0] });
 }
+
+export async function GET() {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+
+  return NextResponse.json({ user });
+}

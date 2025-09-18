@@ -25,11 +25,12 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { UserTable } from "@/db/schema"
 
 // This is sample data.
 const data = {
   user: {
-    name: "elie",
+    username: "elie",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
@@ -156,7 +157,10 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar(
+  { user, ...props }: { user: Pick<UserTable, "username" | "email" | "avatar" | "firstName" | "lastName"> } 
+  & React.ComponentProps<typeof Sidebar>
+) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -167,7 +171,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
